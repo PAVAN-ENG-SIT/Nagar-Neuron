@@ -6,6 +6,13 @@ export const AppColors = {
   success: "#10b981",
   warning: "#f59e0b",
   danger: "#ef4444",
+  error: "#ef4444",
+  info: "#0ea5e9",
+  
+  textPrimary: "#111827",
+  textSecondary: "#6b7280",
+  textMuted: "#9ca3af",
+  backgroundMuted: "#f3f4f6",
   
   categoryPothole: "#ef4444",
   categoryGarbage: "#10b981",
@@ -65,6 +72,7 @@ export const Spacing = {
   md: 12,
   lg: 16,
   xl: 24,
+  xxl: 32,
   "2xl": 32,
   "3xl": 40,
   "4xl": 48,

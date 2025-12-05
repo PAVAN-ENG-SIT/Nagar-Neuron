@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, lazy, Suspense } from "react";
 import { View, StyleSheet, ActivityIndicator, Text, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -10,6 +10,21 @@ import { AppColors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { Complaint } from "@shared/schema";
 import { ThemedText } from "@/components/ThemedText";
+
+let MapViewComponent: any = null;
+let MarkerComponent: any = null;
+let CalloutComponent: any = null;
+
+if (Platform.OS !== "web") {
+  try {
+    const maps = require("react-native-maps");
+    MapViewComponent = maps.default;
+    MarkerComponent = maps.Marker;
+    CalloutComponent = maps.Callout;
+  } catch (e) {
+    console.log("react-native-maps not available");
+  }
+}
 
 const BANGALORE_REGION = {
   latitude: 12.9716,
@@ -39,7 +54,7 @@ export default function MapScreen() {
     navigation.navigate("Detail", { complaintId });
   }, [navigation]);
 
-  if (Platform.OS === "web") {
+  if (Platform.OS === "web" || !MapViewComponent) {
     return (
       <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
         <View style={[styles.webFallback, { paddingTop: insets.top + 60 }]}>
@@ -70,9 +85,6 @@ export default function MapScreen() {
     );
   }
 
-  const MapView = require("react-native-maps").default;
-  const { Marker, Callout } = require("react-native-maps");
-
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
       {isLoading ? (
@@ -80,14 +92,14 @@ export default function MapScreen() {
           <ActivityIndicator size="large" color={AppColors.primary} />
         </View>
       ) : (
-        <MapView
+        <MapViewComponent
           style={styles.map}
           initialRegion={BANGALORE_REGION}
           showsUserLocation
           showsMyLocationButton
         >
           {complaints.map((complaint) => (
-            <Marker
+            <MarkerComponent
               key={complaint.id}
               coordinate={{
                 latitude: complaint.latitude,
@@ -96,7 +108,7 @@ export default function MapScreen() {
               pinColor={categoryColors[complaint.category] || AppColors.categoryOther}
               onCalloutPress={() => handleMarkerPress(complaint.id)}
             >
-              <Callout tooltip>
+              <CalloutComponent tooltip>
                 <View style={[styles.callout, { backgroundColor: theme.cardBackground }]}>
                   <Text style={[styles.calloutCategory, { color: categoryColors[complaint.category] }]}>
                     {complaint.category.toUpperCase()}
@@ -111,10 +123,10 @@ export default function MapScreen() {
                     Tap to view details
                   </Text>
                 </View>
-              </Callout>
-            </Marker>
+              </CalloutComponent>
+            </MarkerComponent>
           ))}
-        </MapView>
+        </MapViewComponent>
       )}
       <View style={[styles.legend, { backgroundColor: theme.cardBackground, bottom: insets.bottom + 100 }]}>
         {Object.entries(categoryColors).map(([category, color]) => (

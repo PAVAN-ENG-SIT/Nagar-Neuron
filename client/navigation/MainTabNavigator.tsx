@@ -16,7 +16,7 @@ import Animated, {
 import HomeStackNavigator from "@/navigation/HomeStackNavigator";
 import MapScreen from "@/screens/MapScreen";
 import StatsScreen from "@/screens/StatsScreen";
-import SettingsScreen from "@/screens/SettingsScreen";
+import ProfileScreen from "@/screens/ProfileScreen";
 import { useTheme } from "@/hooks/useTheme";
 import { AppColors, Spacing, Shadows, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -25,7 +25,7 @@ export type MainTabParamList = {
   HomeTab: undefined;
   MapTab: undefined;
   StatsTab: undefined;
-  SettingsTab: undefined;
+  ProfileTab: undefined;
 };
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -133,12 +133,12 @@ export default function MainTabNavigator() {
           }}
         />
         <Tab.Screen
-          name="SettingsTab"
-          component={SettingsScreen}
+          name="ProfileTab"
+          component={ProfileScreen}
           options={{
-            title: "Settings",
+            title: "Profile",
             tabBarIcon: ({ color, size }) => (
-              <MaterialIcons name="settings" size={size} color={color} />
+              <MaterialIcons name="person" size={size} color={color} />
             ),
           }}
         />
