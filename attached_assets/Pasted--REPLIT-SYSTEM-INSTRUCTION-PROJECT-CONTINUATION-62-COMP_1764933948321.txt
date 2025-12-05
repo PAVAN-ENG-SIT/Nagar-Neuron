@@ -1,0 +1,101 @@
+📌 REPLIT SYSTEM INSTRUCTION — PROJECT CONTINUATION (62% COMPLETE → CONTINUE NEXT 38%)
+
+You (ChatGPT) have successfully completed **62% of the full NagarNeuron project** from the provided specification.  
+You have already delivered:
+
+- Complete architecture & folder structure  
+- All backend + mobile specification documents  
+- Dependencies & configuration files  
+- README + Replit setup  
+- AI workflow & model selection  
+- Full problem statement & hackathon documentation  
+
+Now, your next task is to continue the remaining **38% of the project work** with a strong focus on:
+
+-------------------------------------------------------------
+🎨 **UI/UX Enhancement Phase (HIGH PRIORITY)**  
+-------------------------------------------------------------
+
+You must now elevate the mobile app UI/UX to a professional, modern, visually appealing, hackathon-winning level using:
+
+### ✔ Best practices from top-tier design systems:
+- Material Design 3
+- iOS Human Interface Guidelines
+- Expo + React Native design standards
+
+### ✔ Use these recommended color palettes:
+Primary Colors:
+- **Royal Blue (#3B82F6)** – primary brand color  
+- **Indigo Depth (#4338CA)** – headers & strong accents  
+- **Sky Blue (#0EA5E9)** – soft highlights  
+
+Secondary Colors:
+- **Emerald Green (#10B981)** – success, resolved  
+- **Amber Orange (#F59E0B)** – warnings  
+- **Rose Red (#EF4444)** – critical severity  
+
+Neutral Colors:
+- **Slate Gray (#475569)** – body text  
+- **Cool Gray (#CBD5E1)** – borders / dividers  
+- **White (#FFFFFF)** – card backgrounds  
+
+### ✔ UI/UX Goals:
+- Highly polished, sharp, card-based layout  
+- Smooth transitions, shadows, and rounded corners  
+- Beautiful spacing + typography hierarchy  
+- Clean, minimalistic icons via @expo/vector-icons  
+- High contrast for readability  
+- Consistent visual hierarchy across screens  
+
+-------------------------------------------------------------
+🧩 **TASKS YOU MUST COMPLETE NOW (38% REMAINING WORK)**  
+-------------------------------------------------------------
+
+You must continue development based on the ORIGINAL SPECIFICATION below:
+
+1️⃣ **Generate complete backend code**
+- backend/main.py → FULL functional FastAPI server
+- Implement all API routes exactly as defined
+- MongoDB integration (pymongo)
+- Hugging Face BLIP image captioning integration
+- EXIF GPS extraction with piexif
+- Reverse geocoding (Nominatim)
+- Category + severity classification logic
+- Logging + error handling
+
+2️⃣ **Generate backend/seed_data.py**
+- Insert 30 realistic Bangalore complaints
+- Proper timestamps, statuses, AI-style descriptions
+
+3️⃣ **Generate full React Native UI code for ALL screens**
+- HomeScreen (with new modern UI/UX)
+- UploadScreen (camera/gallery + clean card design)
+- MapScreen (beautiful markers + legend)
+- DetailScreen (card sections + status timeline)
+- StatsScreen (dashboard cards + bars)
+
+4️⃣ **Generate reusable UI components**
+- ComplaintCard (premium card layout)
+- CategoryBadge (icons + gradient backgrounds)
+- StatusBadge (pill-style badges)
+
+5️⃣ **Generate mobile/utils/api.ts**
+- API functions for all backend routes
+- Error handling + Promise-based architecture
+
+6️⃣ All output MUST be:
+- Clean, copy-paste ready
+- Fully runnable
+- Optimized for Expo Go on Android
+- Follows the enhanced UI/UX theme defined above
+
+-------------------------------------------------------------
+📦 **REFERENCE PROJECT SPECIFICATION (DO NOT MODIFY)**  
+-------------------------------------------------------------
+{
+[PASTE COMPLETE ORIGINAL PROMPT CONTENT HERE — already provided above]
+}
+-------------------------------------------------------------
+
+Now continue the project and generate the required files & code step-by-step with upgraded UI/UX improvements.
+
