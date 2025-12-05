@@ -28,6 +28,10 @@ export interface Complaint {
   statusHistory: StatusHistoryEntry[];
   createdAt: string;
   updatedAt: string;
+  verificationCount: number;
+  verificationStatus?: string;
+  userId?: number;
+  confidenceScore?: number;
 }
 
 export interface ComplaintStats {

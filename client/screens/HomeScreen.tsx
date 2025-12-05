@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   FlatList,
@@ -7,6 +7,8 @@ import {
   Pressable,
   RefreshControl,
   ActivityIndicator,
+  TouchableOpacity,
+  Text,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -14,15 +16,15 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useTheme } from "@/hooks/useTheme";
-import { AppColors, Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { AppColors, Spacing, BorderRadius, Shadows, Typography } from "@/constants/theme";
 import { ThemedText } from "@/components/ThemedText";
 import { ComplaintCard } from "@/components/ComplaintCard";
-import { queryClient } from "@/lib/query-client";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { Complaint, ComplaintCategory, ComplaintStatus, ComplaintStats } from "@shared/schema";
+import { useAuth } from "@/lib/auth-context";
 
 const CATEGORIES: (ComplaintCategory | "all")[] = ["all", "pothole", "garbage", "streetlight", "drainage", "other"];
 const STATUSES: (ComplaintStatus | "all")[] = ["all", "Reported", "Assigned", "In Progress", "Resolved"];
@@ -83,23 +85,73 @@ function StatSummaryCard({ title, value, icon, color, theme }: StatSummaryCardPr
   );
 }
 
+interface VerifyPromptProps {
+  complaintsToVerify: Complaint[];
+  onVerifyPress: (complaintId: string) => void;
+  theme: any;
+}
+
+function VerifyPromptBanner({ complaintsToVerify, onVerifyPress, theme }: VerifyPromptProps) {
+  if (complaintsToVerify.length === 0) return null;
+  
+  const complaint = complaintsToVerify[0];
+  
+  return (
+    <TouchableOpacity 
+      style={[styles.verifyBanner, { backgroundColor: theme.cardBackground }]}
+      onPress={() => onVerifyPress(complaint.id)}
+    >
+      <View style={styles.verifyBannerIcon}>
+        <MaterialIcons name="verified" size={28} color={AppColors.info} />
+      </View>
+      <View style={styles.verifyBannerContent}>
+        <Text style={[styles.verifyBannerTitle, { color: theme.text }]}>
+          Help verify nearby reports
+        </Text>
+        <Text style={[styles.verifyBannerSubtitle, { color: theme.textSecondary }]}>
+          {complaintsToVerify.length} complaint{complaintsToVerify.length > 1 ? 's' : ''} need{complaintsToVerify.length === 1 ? 's' : ''} verification
+        </Text>
+      </View>
+      <View style={styles.verifyBannerBadge}>
+        <Text style={styles.verifyBadgeText}>+10 pts</Text>
+      </View>
+      <MaterialIcons name="chevron-right" size={24} color={theme.textSecondary} />
+    </TouchableOpacity>
+  );
+}
+
+const POLLING_INTERVAL = 30000;
+
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const [selectedCategory, setSelectedCategory] = useState<ComplaintCategory | "all">("all");
   const [selectedStatus, setSelectedStatus] = useState<ComplaintStatus | "all">("all");
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
   const { data: complaints = [], isLoading, refetch, isRefetching } = useQuery<Complaint[]>({
     queryKey: ["/api/complaints"],
+    refetchInterval: POLLING_INTERVAL,
+    refetchIntervalInBackground: false,
   });
 
-  const { data: stats } = useQuery<ComplaintStats>({
+  const { data: stats, refetch: refetchStats } = useQuery<ComplaintStats>({
     queryKey: ["/api/stats"],
+    refetchInterval: POLLING_INTERVAL,
+    refetchIntervalInBackground: false,
   });
+
+  useEffect(() => {
+    if (complaints.length > 0) {
+      setLastUpdate(new Date());
+    }
+  }, [complaints]);
 
   const filteredComplaints = complaints.filter((complaint) => {
     const categoryMatch = selectedCategory === "all" || complaint.category === selectedCategory;
@@ -107,11 +159,19 @@ export default function HomeScreen() {
     return categoryMatch && statusMatch;
   });
 
+  const complaintsNeedingVerification = complaints.filter((complaint) => {
+    const needsVerification = complaint.verificationCount < 3;
+    const notResolved = complaint.status !== "Resolved";
+    const notOwnComplaint = complaint.userId !== user?.id;
+    return needsVerification && notResolved && notOwnComplaint;
+  });
+
   const handleRefresh = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["/api/complaints"] });
     queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
     refetch();
-  }, [refetch]);
+    refetchStats();
+  }, [refetch, refetchStats, queryClient]);
 
   const handleComplaintPress = useCallback((complaintId: string) => {
     navigation.navigate("Detail", { complaintId });
@@ -140,6 +200,12 @@ export default function HomeScreen() {
 
   const renderHeader = () => (
     <View>
+      <VerifyPromptBanner
+        complaintsToVerify={complaintsNeedingVerification}
+        onVerifyPress={handleComplaintPress}
+        theme={theme}
+      />
+      
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -324,5 +390,52 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: Spacing["5xl"],
+  },
+  verifyBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.lg,
+    borderWidth: 1,
+    borderColor: AppColors.info,
+    borderStyle: "dashed",
+    ...Shadows.small,
+  },
+  verifyBannerIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: `${AppColors.info}20`,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: Spacing.md,
+  },
+  verifyBannerContent: {
+    flex: 1,
+  },
+  verifyBannerTitle: {
+    ...Typography.body,
+    fontWeight: "600",
+  },
+  verifyBannerSubtitle: {
+    ...Typography.caption,
+    marginTop: 2,
+  },
+  verifyBannerBadge: {
+    backgroundColor: AppColors.success,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.sm,
+    marginRight: Spacing.sm,
+  },
+  verifyBadgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  lastUpdateText: {
+    textAlign: "center",
+    marginBottom: Spacing.sm,
   },
 });
