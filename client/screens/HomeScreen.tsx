@@ -85,6 +85,34 @@ function StatSummaryCard({ title, value, icon, color, theme }: StatSummaryCardPr
   );
 }
 
+interface QuickActionCardProps {
+  title: string;
+  subtitle: string;
+  icon: keyof typeof MaterialIcons.glyphMap;
+  color: string;
+  onPress: () => void;
+  theme: any;
+}
+
+function QuickActionCard({ title, subtitle, icon, color, onPress, theme }: QuickActionCardProps) {
+  return (
+    <TouchableOpacity 
+      style={[styles.quickActionCard, { backgroundColor: theme.cardBackground }]}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
+      <View style={[styles.quickActionIcon, { backgroundColor: `${color}20` }]}>
+        <MaterialIcons name={icon} size={24} color={color} />
+      </View>
+      <View style={styles.quickActionContent}>
+        <Text style={[styles.quickActionTitle, { color: theme.text }]}>{title}</Text>
+        <Text style={[styles.quickActionSubtitle, { color: theme.textSecondary }]}>{subtitle}</Text>
+      </View>
+      <MaterialIcons name="chevron-right" size={24} color={theme.textMuted} />
+    </TouchableOpacity>
+  );
+}
+
 interface VerifyPromptProps {
   complaintsToVerify: Complaint[];
   onVerifyPress: (complaintId: string) => void;
@@ -234,6 +262,36 @@ export default function HomeScreen() {
           theme={theme}
         />
       </ScrollView>
+
+      <ThemedText type="small" style={[styles.filterLabel, { color: theme.textSecondary }]}>
+        Quick Actions
+      </ThemedText>
+      <View style={styles.quickActionsContainer}>
+        <QuickActionCard
+          title="Analytics"
+          subtitle="View trends & stats"
+          icon="bar-chart"
+          color={AppColors.info}
+          onPress={() => navigation.navigate("Analytics")}
+          theme={theme}
+        />
+        <QuickActionCard
+          title="Hotspots"
+          subtitle="Problem areas & predictions"
+          icon="place"
+          color={AppColors.error}
+          onPress={() => navigation.navigate("Hotspots")}
+          theme={theme}
+        />
+        <QuickActionCard
+          title="Verify Nearby"
+          subtitle="Help verify reports"
+          icon="verified"
+          color={AppColors.success}
+          onPress={() => navigation.navigate("NearbyUnverified")}
+          theme={theme}
+        />
+      </View>
 
       <ThemedText type="small" style={[styles.filterLabel, { color: theme.textSecondary }]}>
         Category
@@ -437,5 +495,35 @@ const styles = StyleSheet.create({
   lastUpdateText: {
     textAlign: "center",
     marginBottom: Spacing.sm,
+  },
+  quickActionsContainer: {
+    marginBottom: Spacing.lg,
+    gap: Spacing.sm,
+  },
+  quickActionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    ...Shadows.small,
+  },
+  quickActionIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: Spacing.md,
+  },
+  quickActionContent: {
+    flex: 1,
+  },
+  quickActionTitle: {
+    ...Typography.body,
+    fontWeight: "600",
+  },
+  quickActionSubtitle: {
+    ...Typography.caption,
+    marginTop: 2,
   },
 });

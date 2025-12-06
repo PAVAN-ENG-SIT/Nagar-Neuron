@@ -7,6 +7,7 @@ import {
   Alert,
   Platform,
   Pressable,
+  Text,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -17,13 +18,29 @@ import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import { Image } from "expo-image";
 import { useMutation } from "@tanstack/react-query";
+import Animated, { FadeIn, FadeInDown, useAnimatedStyle, useSharedValue, withTiming, withRepeat, withSequence } from "react-native-reanimated";
 
 import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollViewCompat";
 import { useTheme } from "@/hooks/useTheme";
-import { AppColors, Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { AppColors, Spacing, BorderRadius, Shadows, Typography } from "@/constants/theme";
 import { ThemedText } from "@/components/ThemedText";
 import { apiRequest, queryClient } from "@/lib/query-client";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { ComplaintCategory } from "@shared/schema";
+
+interface AIClassificationResult {
+  category: ComplaintCategory;
+  confidence: number;
+  alternates: { category: ComplaintCategory; confidence: number }[];
+}
+
+const CATEGORY_INFO: Record<ComplaintCategory, { icon: keyof typeof MaterialIcons.glyphMap; color: string; label: string }> = {
+  pothole: { icon: "warning", color: AppColors.categoryPothole, label: "Pothole" },
+  garbage: { icon: "delete", color: AppColors.categoryGarbage, label: "Garbage" },
+  streetlight: { icon: "lightbulb", color: AppColors.categoryStreetlight, label: "Streetlight" },
+  drainage: { icon: "water-drop", color: AppColors.categoryDrainage, label: "Drainage" },
+  other: { icon: "help-outline", color: AppColors.categoryOther, label: "Other" },
+};
 
 export default function UploadScreen() {
   const insets = useSafeAreaInsets();
@@ -36,6 +53,33 @@ export default function UploadScreen() {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [notes, setNotes] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [isClassifying, setIsClassifying] = useState(false);
+  const [aiResult, setAiResult] = useState<AIClassificationResult | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<ComplaintCategory | null>(null);
+
+  const pulseAnim = useSharedValue(1);
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulseAnim.value }],
+    opacity: pulseAnim.value === 1 ? 1 : 0.7,
+  }));
+
+  const simulateAIClassification = async (): Promise<AIClassificationResult> => {
+    const categories: ComplaintCategory[] = ["pothole", "garbage", "streetlight", "drainage", "other"];
+    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+    const confidence = 0.75 + Math.random() * 0.2;
+    
+    const alternates = categories
+      .filter(c => c !== randomCategory)
+      .slice(0, 2)
+      .map(c => ({ category: c, confidence: 0.05 + Math.random() * 0.15 }));
+
+    return {
+      category: randomCategory,
+      confidence,
+      alternates,
+    };
+  };
 
   useEffect(() => {
     requestPermissions();
@@ -94,15 +138,38 @@ export default function UploadScreen() {
         setImageUri(result.assets[0].uri);
         setImageBase64(result.assets[0].base64 || null);
         getCurrentLocation();
+        
+        setIsClassifying(true);
+        setAiResult(null);
+        setSelectedCategory(null);
+        pulseAnim.value = withRepeat(
+          withSequence(
+            withTiming(1.1, { duration: 500 }),
+            withTiming(1, { duration: 500 })
+          ),
+          -1,
+          true
+        );
+        
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        const classification = await simulateAIClassification();
+        setAiResult(classification);
+        setSelectedCategory(classification.category);
+        setIsClassifying(false);
+        pulseAnim.value = 1;
       }
     } catch (error) {
       Alert.alert("Error", "Failed to pick image. Please try again.");
+      setIsClassifying(false);
     }
   };
 
   const removeImage = () => {
     setImageUri(null);
     setImageBase64(null);
+    setAiResult(null);
+    setSelectedCategory(null);
+    setIsClassifying(false);
   };
 
   const submitMutation = useMutation({

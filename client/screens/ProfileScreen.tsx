@@ -10,11 +10,14 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAuth } from "@/lib/auth-context";
 import { getUserProfile, User, Badge } from "@/lib/api";
 import { useTheme } from "@/hooks/useTheme";
+import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { AppColors, Spacing, Typography, Shadows, BorderRadius } from "@/constants/theme";
-import Card from "@/components/Card";
+import { Card } from "@/components/Card";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 
@@ -42,6 +45,7 @@ function BadgeItem({ badge, earned }: { badge: Badge; earned: boolean }) {
 export default function ProfileScreen() {
   const { theme } = useTheme();
   const { user, logout, refreshUser } = useAuth();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const { data: profile, isLoading, isError, error, refetch } = useQuery<User>({
     queryKey: ["api", "user", "profile"],
@@ -170,9 +174,39 @@ export default function ProfileScreen() {
         </Card>
 
         <View style={styles.menuSection}>
-          <TouchableOpacity style={[styles.menuItem, { backgroundColor: theme.cardBackground }]}>
+          <TouchableOpacity 
+            style={[styles.menuItem, { backgroundColor: theme.cardBackground }]}
+            onPress={() => navigation.navigate("MyComplaints")}
+          >
             <MaterialIcons name="history" size={24} color={AppColors.textSecondary} />
             <Text style={[styles.menuText, { color: theme.text }]}>My Reports</Text>
+            <MaterialIcons name="chevron-right" size={24} color={AppColors.textMuted} />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.menuItem, { backgroundColor: theme.cardBackground }]}
+            onPress={() => navigation.navigate("Notifications")}
+          >
+            <MaterialIcons name="notifications" size={24} color={AppColors.textSecondary} />
+            <Text style={[styles.menuText, { color: theme.text }]}>Notifications</Text>
+            <MaterialIcons name="chevron-right" size={24} color={AppColors.textMuted} />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.menuItem, { backgroundColor: theme.cardBackground }]}
+            onPress={() => navigation.navigate("Analytics")}
+          >
+            <MaterialIcons name="bar-chart" size={24} color={AppColors.textSecondary} />
+            <Text style={[styles.menuText, { color: theme.text }]}>Analytics</Text>
+            <MaterialIcons name="chevron-right" size={24} color={AppColors.textMuted} />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.menuItem, { backgroundColor: theme.cardBackground }]}
+            onPress={() => navigation.navigate("Insights")}
+          >
+            <MaterialIcons name="lightbulb" size={24} color={AppColors.textSecondary} />
+            <Text style={[styles.menuText, { color: theme.text }]}>AI Insights</Text>
             <MaterialIcons name="chevron-right" size={24} color={AppColors.textMuted} />
           </TouchableOpacity>
 
