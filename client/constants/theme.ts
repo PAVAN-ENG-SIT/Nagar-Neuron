@@ -179,3 +179,69 @@ export const Fonts = Platform.select({
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
+
+export const colors = {
+  primary: AppColors.primary,
+  primaryDark: AppColors.primaryDark,
+  error: AppColors.error,
+  warning: AppColors.warning,
+  success: AppColors.success,
+  info: AppColors.info,
+  danger: AppColors.danger,
+  surface: {
+    primary: Colors.light.cardBackground,
+    secondary: Colors.light.backgroundSecondary,
+    tertiary: Colors.light.backgroundTertiary,
+  },
+  text: {
+    primary: Colors.light.text,
+    secondary: Colors.light.textSecondary,
+    tertiary: Colors.light.textMuted,
+    inverse: "#FFFFFF",
+  },
+  border: Colors.light.border,
+  background: {
+    primary: Colors.light.backgroundRoot,
+    secondary: Colors.light.backgroundSecondary,
+    tertiary: Colors.light.backgroundTertiary,
+    muted: AppColors.backgroundMuted,
+  },
+  category: {
+    pothole: AppColors.categoryPothole,
+    garbage: AppColors.categoryGarbage,
+    streetlight: AppColors.categoryStreetlight,
+    drainage: AppColors.categoryDrainage,
+    other: AppColors.categoryOther,
+  },
+  status: {
+    reported: { bg: AppColors.statusReportedBg, text: AppColors.statusReportedText },
+    assigned: { bg: AppColors.statusAssignedBg, text: AppColors.statusAssignedText },
+    inProgress: { bg: AppColors.statusInProgressBg, text: AppColors.statusInProgressText },
+    resolved: { bg: AppColors.statusResolvedBg, text: AppColors.statusResolvedText },
+  },
+};
+
+export const spacing = Spacing;
+
+export const typography = {
+  ...Typography,
+  sizes: {
+    xs: 12,
+    sm: 14,
+    md: 16,
+    lg: 18,
+    xl: 24,
+    "2xl": 28,
+    "3xl": 32,
+  },
+  weights: {
+    normal: "400" as const,
+    medium: "500" as const,
+    semibold: "600" as const,
+    bold: "700" as const,
+  },
+};
+
+export const borderRadius = BorderRadius;
+
+export const shadows = Shadows;

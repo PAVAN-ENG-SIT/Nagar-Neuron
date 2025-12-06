@@ -6,6 +6,13 @@ import DetailScreen from "@/screens/DetailScreen";
 import LoginScreen from "@/screens/LoginScreen";
 import LeaderboardScreen from "@/screens/LeaderboardScreen";
 import BadgesScreen from "@/screens/BadgesScreen";
+import VerifyComplaintScreen from "@/screens/VerifyComplaintScreen";
+import NearbyUnverifiedScreen from "@/screens/NearbyUnverifiedScreen";
+import AnalyticsScreen from "@/screens/AnalyticsScreen";
+import HotspotsScreen from "@/screens/HotspotsScreen";
+import InsightsScreen from "@/screens/InsightsScreen";
+import NotificationCenterScreen from "@/screens/NotificationCenterScreen";
+import MyComplaintsScreen from "@/screens/MyComplaintsScreen";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 import { useAuth } from "@/lib/auth-context";
 import { ActivityIndicator, View } from "react-native";
@@ -18,6 +25,13 @@ export type RootStackParamList = {
   Detail: { complaintId: string };
   Leaderboard: undefined;
   Badges: undefined;
+  VerifyComplaint: { complaint: any };
+  NearbyUnverified: undefined;
+  Analytics: undefined;
+  Hotspots: undefined;
+  Insights: undefined;
+  Notifications: undefined;
+  MyComplaints: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -79,6 +93,62 @@ export default function RootStackNavigator() {
             options={{
               presentation: "modal",
               headerTitle: "Achievements",
+            }}
+          />
+          <Stack.Screen
+            name="VerifyComplaint"
+            component={VerifyComplaintScreen}
+            options={{
+              presentation: "modal",
+              headerTitle: "Verify Complaint",
+            }}
+          />
+          <Stack.Screen
+            name="NearbyUnverified"
+            component={NearbyUnverifiedScreen}
+            options={{
+              presentation: "modal",
+              headerTitle: "Nearby Complaints",
+            }}
+          />
+          <Stack.Screen
+            name="Analytics"
+            component={AnalyticsScreen}
+            options={{
+              presentation: "modal",
+              headerTitle: "Analytics",
+            }}
+          />
+          <Stack.Screen
+            name="Hotspots"
+            component={HotspotsScreen}
+            options={{
+              presentation: "modal",
+              headerTitle: "Hotspots",
+            }}
+          />
+          <Stack.Screen
+            name="Insights"
+            component={InsightsScreen}
+            options={{
+              presentation: "modal",
+              headerTitle: "AI Insights",
+            }}
+          />
+          <Stack.Screen
+            name="Notifications"
+            component={NotificationCenterScreen}
+            options={{
+              presentation: "modal",
+              headerTitle: "Notifications",
+            }}
+          />
+          <Stack.Screen
+            name="MyComplaints"
+            component={MyComplaintsScreen}
+            options={{
+              presentation: "modal",
+              headerTitle: "My Complaints",
             }}
           />
         </>
